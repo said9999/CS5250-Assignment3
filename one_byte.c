@@ -1,4 +1,5 @@
 #include <linux/module.h>
+#include <linux/moduleparam.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/slab.h>
@@ -6,8 +7,12 @@
 #include <linux/types.h>
 #include <linux/fs.h>
 #include <linux/proc_fs.h>
-#include <asm/uaccess.h>
+//#include <asm/uaccess.h>
 #define MAJOR_NUMBER 61
+
+static char *who = "default";
+module_param(who, charp, 0660);
+
 /* forward declaration */
 int onebyte_open(struct inode *inode, struct file *filep);
 int onebyte_release(struct inode *inode, struct file *filep);
@@ -36,11 +41,13 @@ int onebyte_release(struct inode *inode, struct file *filep)
 count, loff_t *f_pos)
 {
      /*please complete the function on your own*/
+     return 0;
 }
 ssize_t onebyte_write(struct file *filep, const char *buf,
 size_t count, loff_t *f_pos)
 {
      /*please complete the function on your own*/
+     return 0;
 }
 static int onebyte_init(void)
 {
@@ -59,12 +66,12 @@ static int onebyte_init(void)
      if (!onebyte_data) {
           onebyte_exit();
           // cannot allocate memory
-          // return no memory error, negative signify a
-     failure
+          // return no memory error, negative signify a failure
           return -ENOMEM;
      }
      // initialize the value to be X
      *onebyte_data = 'X';
+     printk(KERN_ALERT "hello %s", who);
      printk(KERN_ALERT "This is a onebyte device module\n");
      return 0;
 }
@@ -72,7 +79,6 @@ static void onebyte_exit(void)
 {
      // if the pointer is pointing to something
      if (onebyte_data) {
-
 // free the memory and assign the pointer to NULL
           kfree(onebyte_data);
           onebyte_data = NULL;
