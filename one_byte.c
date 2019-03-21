@@ -42,12 +42,12 @@ int onebyte_release(struct inode *inode, struct file *filep)
 count, loff_t *f_pos)
 {
      /*please complete the function on your own*/
-     if (onebyte_data == NULL) {
+     if (*onebyte_data == '\0') {
           return 0;
      }
      copy_to_user(buf, onebyte_data, 1);
 
-     onebyte_data = NULL;
+     *onebyte_data = '\0';
 
      return 1;
 }
@@ -55,9 +55,23 @@ ssize_t onebyte_write(struct file *filep, const char *buf,
 size_t count, loff_t *f_pos)
 {
      /*please complete the function on your own*/
-     printk(KERN_ALERT "%s", buf);
-     printk(KERN_ALERT "%ld", count);
-     return 0;
+     printk(KERN_ALERT "count: %ld", count);
+     if (count == 0) {
+          return 0;
+     }
+     if (*onebyte_data != '\0') {
+          printk(KERN_ALERT "here1");
+          return -ENOSPC;
+     }
+
+     copy_from_user(onebyte_data, buf, 1);
+     if (count > 1) {
+          printk(KERN_ALERT "here2");
+          return -ENOSPC;
+     }
+     
+     
+     return 1;
 }
 static int onebyte_init(void)
 {
